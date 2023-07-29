@@ -111,7 +111,7 @@ def lambda_handler(event, context):
         'batchItemFailures': []
     }
 
-    for index, message in enumerate(event['body']):
+    for index, message in enumerate(event['Records']):
 
         # Empty the sinks in case some content was left due to errors and initialize
         # num_batch to 1.
@@ -119,17 +119,18 @@ def lambda_handler(event, context):
 
         try:
             s3_notification = json.loads(message['Records'])
-            logger.info('The message body - ', s3_notification)
+
         except json.decoder.JSONDecodeError as exception:
             logging.warning(
                 'Dropping message %s, body is not valid JSON', exception.doc)
             continue
+
         bucket_name = s3_notification['s3']['bucket']['name']
         key_name = s3_notification['s3']['object']['key']
 
         logger.info(
             'Processing object s3://%s/%s; posted by %s',
-            bucket_name, key_name, s3_notification['userIdentity']['principalId'])
+            bucket_name, key_name, s3_notification['Records'][index]['userIdentity']['principalId'])
 
         # Catch all exception. If anything fails, add messageId to batchItemFailures
         try:
