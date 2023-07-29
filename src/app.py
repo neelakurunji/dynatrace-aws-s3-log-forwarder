@@ -118,13 +118,12 @@ def lambda_handler(event, context):
         dynatrace.empty_sinks(dynatrace_sinks)
 
         try:
-            s3_notification = json.loads(message['body'])
+            s3_notification = json.loads(message)
+            logger.info('The message body - ', s3_notification)
         except json.decoder.JSONDecodeError as exception:
             logging.warning(
                 'Dropping message %s, body is not valid JSON', exception.doc)
             continue
-
-        logger.info('The message body - ', s3_notification)
         bucket_name = s3_notification['s3']['bucket']['name']
         key_name = s3_notification['s3']['object']['key']
 
