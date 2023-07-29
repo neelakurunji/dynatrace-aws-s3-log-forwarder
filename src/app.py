@@ -111,14 +111,14 @@ def lambda_handler(event, context):
         'batchItemFailures': []
     }
 
-    for index, message in enumerate(event['Records']):
+    for index, message in enumerate(event['body']):
 
         # Empty the sinks in case some content was left due to errors and initialize
         # num_batch to 1.
         dynatrace.empty_sinks(dynatrace_sinks)
 
         try:
-            s3_notification = json.loads(message['body'])
+            s3_notification = json.loads(message['Records'])
             logger.info('The message body - ', s3_notification)
         except json.decoder.JSONDecodeError as exception:
             logging.warning(
