@@ -102,7 +102,7 @@ def lambda_handler(event, context):
     # reload_rules('forwarding')
     # reload_rules('processing')
 
-    logger.info(json.dumps(event, indent=2))
+    logger.info('Venki Request JSON - ', json.dumps(event, indent=2))
 
     os.environ['FORWARDER_FUNCTION_ARN'] = context.invoked_function_arn
 
@@ -118,19 +118,40 @@ def lambda_handler(event, context):
         dynatrace.empty_sinks(dynatrace_sinks)
 
         try:
-            s3_notification = json.loads(message['Records'])
+            s3_notification = json.loads(message['body'])
 
         except json.decoder.JSONDecodeError as exception:
             logging.warning(
                 'Dropping message %s, body is not valid JSON', exception.doc)
             continue
+        
+        try: 
+            bucket_name = s3_notification['s3']['bucket']['name']
+        except Exception as ea:
+            logging.warning(
+                'Could not find bucket name %s, Failed with the above exception!', ea)
+            bucket_name = ""
+            continue
 
-        bucket_name = s3_notification['s3']['bucket']['name']
-        key_name = s3_notification['s3']['object']['key']
+        try: 
+            key_name = s3_notification['s3']['object']['key']
+        except Exception as eb:
+            logging.warning(
+                'Could not find key name %s, Failed with the above exception!', eb)
+            key_name = ""
+            continue
+
+        try: 
+            user_id = s3_notification['userIdentity']['principalId']
+        except Exception as ec:
+            logging.warning(
+                'Could not find account_id %s, Failed with the above exception!', ec)
+            user_id = ""
+            continue
 
         logger.info(
             'Processing object s3://%s/%s; posted by %s',
-            bucket_name, key_name, s3_notification['Records'][index]['userIdentity']['principalId'])
+            bucket_name, key_name, user_id)
 
         # Catch all exception. If anything fails, add messageId to batchItemFailures
         try:
