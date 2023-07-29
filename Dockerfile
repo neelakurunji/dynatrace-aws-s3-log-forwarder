@@ -60,10 +60,7 @@ CMD [ "app.lambda_handler" ]
 
 # Bundle Lambda Insights extensions if enabled
 FROM base AS deploy_lambda_insights_true
-ARG ARCH
-COPY .tmp/${ARCH}/aws_lambda_insights_extension.zip /tmp/
-RUN unzip /tmp/aws_lambda_insights_extension.zip -d /opt \
-    && rm -f /tmp/aws_lambda_insights_extension.zip
+# do nothing
 
 FROM base AS deploy_lambda_insights_false
 # do nothing
