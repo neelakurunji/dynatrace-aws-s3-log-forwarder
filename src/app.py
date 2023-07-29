@@ -102,7 +102,7 @@ def lambda_handler(event, context):
     # reload_rules('forwarding')
     # reload_rules('processing')
 
-    logger.debug(json.dumps(event, indent=2))
+    logger.info(json.dumps(event, indent=2))
 
     os.environ['FORWARDER_FUNCTION_ARN'] = context.invoked_function_arn
 
@@ -118,7 +118,7 @@ def lambda_handler(event, context):
         dynatrace.empty_sinks(dynatrace_sinks)
 
         try:
-            s3_notification = json.loads(message)
+            s3_notification = json.loads(message['body'])
             logger.info('The message body - ', s3_notification)
         except json.decoder.JSONDecodeError as exception:
             logging.warning(
