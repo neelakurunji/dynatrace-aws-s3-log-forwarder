@@ -102,7 +102,8 @@ def lambda_handler(event, context):
     # reload_rules('forwarding')
     # reload_rules('processing')
 
-    logger.info('Venki Request JSON - ', json.dumps(event, indent=2))
+    logger.info('Venki Request JSON as follows - ')
+    logger.info(json.dumps(event, indent=2))
 
     os.environ['FORWARDER_FUNCTION_ARN'] = context.invoked_function_arn
 
