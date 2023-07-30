@@ -71,8 +71,8 @@ def generate_execution_timeout_batch_item_failures(index: int, batch_item_failur
 def lambda_handler(event, context):
 
     logging.info("dynatrace-aws-s3-log-forwarder version: %s", get_version())
-
-    logger.info(json.dumps(event, indent=2))
+    
+    logger.debug(json.dumps(event, indent=2))
 
     os.environ['FORWARDER_FUNCTION_ARN'] = context.invoked_function_arn
 
@@ -90,8 +90,8 @@ def lambda_handler(event, context):
         logger.info("The message is - ")
         logger.info(message)
 
+        logger.info("The message body is - ")
         logger.info(message['body'])
-        logger.info(index)
 
         try:
             s3_notification = json.loads(message['body'])
