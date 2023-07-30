@@ -23,7 +23,7 @@ The `dynatrace-aws-s3-log-forwarder` supports out-of-the-box parsing and forward
 * [AWS WAF](https://docs.aws.amazon.com/waf/latest/developerguide/logging-s3.html) logs
 * Custom Logs
 
-Additionally, you can ingest any generic text and JSON logs. For more information.
+Additionally, you can ingest any generic text and JSON logs.
 
 ## Deployment instructions
 
