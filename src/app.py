@@ -23,7 +23,6 @@ from log.processing import log_processing_rules
 from log.processing import processing
 from log.forwarding import log_forwarding_rules
 from log.sinks import dynatrace
-# from utils import aws_appconfig_extension_helpers as aws_appconfig_helpers
 from version import get_version
 
 
@@ -68,39 +67,10 @@ def generate_execution_timeout_batch_item_failures(index: int, batch_item_failur
     return batch_item_failures
 
 
-# def reload_rules(rules_type: str):
-
-#     if os.environ['LOG_FORWARDER_CONFIGURATION_LOCATION'] == "aws-appconfig":
-#         # load globals
-#         glob = globals()
-
-#         try:
-#             # Check if we need to reload log forwarding rules
-#             rules_configuration_profile = aws_appconfig_helpers.get_configuration_from_aws_appconfig(
-#                 f"log-{rules_type}-rules")
-
-#             if rules_configuration_profile['Configuration-Version'] != glob[f"current_log_{rules_type}_rules_version"]:
-#                 logger.info("New log-%s-rules configuration version found. Loading version %s ...",
-#                             str(rules_configuration_profile['Configuration-Version']), rules_type)
-#                 glob[f"defined_log_{rules_type}_rules"], glob[f"current_log_{rules_type}_rules_version"] = glob[f"log_{rules_type}_rules"].load(
-#                 )
-#                 return True
-
-#         except aws_appconfig_helpers.ErrorAccessingAppConfig:
-#             logger.exception(
-#                 "Unable to reload log-%s-rules from AWS AppConfig", rules_type)
-
-#     return False
-
-
 @metrics.log_metrics
 def lambda_handler(event, context):
 
     logging.info("dynatrace-aws-s3-log-forwarder version: %s", get_version())
-
-    # If we're using AWS AppConfig and there's a new config version available, reload
-    # reload_rules('forwarding')
-    # reload_rules('processing')
 
     logger.info(json.dumps(event, indent=2))
 
@@ -132,7 +102,7 @@ def lambda_handler(event, context):
             continue
         
         try: 
-            bucket_name = s3_notification['s3']['bucket']['name']
+            bucket_name = s3_notification['Records'][index]['s3']['bucket']['name']
         except Exception as ea:
             logging.warning(
                 'Could not find bucket name %s, Failed with the above exception!', ea)
@@ -140,7 +110,7 @@ def lambda_handler(event, context):
             continue
 
         try: 
-            key_name = s3_notification['s3']['object']['key']
+            key_name = s3_notification['Records'][index]['s3']['object']['key']
         except Exception as eb:
             logging.warning(
                 'Could not find key name %s, Failed with the above exception!', eb)
@@ -148,7 +118,7 @@ def lambda_handler(event, context):
             continue
 
         try: 
-            user_id = s3_notification['userIdentity']['principalId']
+            user_id = s3_notification['Records'][index]['userIdentity']['principalId']
         except Exception as ec:
             logging.warning(
                 'Could not find account_id %s, Failed with the above exception!', ec)
@@ -205,7 +175,7 @@ def lambda_handler(event, context):
                     continue
 
                 processing.process_log_object(
-                    matched_log_processing_rule, bucket_name, key_name, s3_notification['awsRegion'],
+                    matched_log_processing_rule, bucket_name, key_name, s3_notification['Records'][index]['awsRegion'],
                     log_object_destination_sinks, context,
                     user_defined_annotations=user_defined_log_annotations,
                     session=boto3_session
