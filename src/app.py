@@ -102,7 +102,6 @@ def lambda_handler(event, context):
     # reload_rules('forwarding')
     # reload_rules('processing')
 
-    logger.info('Venki Request JSON as follows - ')
     logger.info(json.dumps(event, indent=2))
 
     os.environ['FORWARDER_FUNCTION_ARN'] = context.invoked_function_arn
@@ -117,6 +116,12 @@ def lambda_handler(event, context):
         # Empty the sinks in case some content was left due to errors and initialize
         # num_batch to 1.
         dynatrace.empty_sinks(dynatrace_sinks)
+
+        logger.info("The message is - ")
+        logger.info(message)
+
+        logger.info(message['body'])
+        logger.info(index)
 
         try:
             s3_notification = json.loads(message['body'])
