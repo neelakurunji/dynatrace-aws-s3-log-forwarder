@@ -124,7 +124,7 @@ fetch logs //, scanLimitGBytes: 500, samplingRatio: 1000
 
 The metrics and the usage stats for the utility will be made available in CloudWatch. A health dashboard will be also created dispalying all the important metrics.
 
-The dashboard name will be - <Your Stack Name>-monitoring-dashboard. A sample screen of the dashboard is shown below - 
+The dashboard name will be - Your Stack Name-monitoring-dashboard. A sample screen of the dashboard is shown below - 
 
 ![Dashboard](docs/images/dashboard.png)
 
