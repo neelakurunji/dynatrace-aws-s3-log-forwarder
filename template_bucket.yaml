@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: |
+  dynatrace-aws-s3-bucket-creator
+
+Parameters:
+  SourceBucketName:
+    Description: Name of the s3 bucket for storing logs
+    Type: String
+  SQSQueue:
+    Description: ARN of the SQS queue to which s3 will send notifications
+    Type: String
+  KmsKey:
+    Description: The ARN of the KMS key created for the bucket
+    Type: String
+
+Resources:
+  SourceBucket:
+    Type: 'AWS::S3::Bucket'
+    DependsOn:
+      - S3NotificationsQueuePolicy
+    Properties:
+      BucketName: !Ref SourceBucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+            ServerSideEncryptionByDefault:
+              SSEAlgorithm: "aws:kms"
+              KMSMasterKeyID: !Ref KmsKey
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Queue: !Ref SQSQueue
+
+  # Allow EventBridge rules to send messages to SQS
+  S3NotificationsQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: !Join ["",['Allow s3 Bucket to Send Messages ',!Ref SourceBucketName]]
+            Effect: "Allow"
+            Principal:
+              Service: "s3.amazonaws.com"
+            Action: "sqs:SendMessage"
+            Resource: !Ref SQSQueue
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Join ["",['arn:aws:s3:::',!Ref SourceBucketName]]
+      Queues:
+        - !Ref SQSQueue
