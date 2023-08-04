@@ -23,7 +23,7 @@ The `dynatrace-aws-s3-log-forwarder` supports out-of-the-box parsing and forward
 * [AWS WAF](https://docs.aws.amazon.com/waf/latest/developerguide/logging-s3.html) logs
 * Custom Logs
 
-Additionally, you can ingest any generic text and JSON logs. For more information.
+Additionally, you can ingest any generic text and JSON logs.
 
 ## Deployment instructions
 
@@ -31,7 +31,7 @@ Additionally, you can ingest any generic text and JSON logs. For more informatio
 
 1. AWS Account
 2. admin IAM Role
-3. AWS ECR FUllAccess Role
+3. AWS ECR FUll Access Role
 4. AWS CLI
 
 ### Deploy the utility
@@ -108,9 +108,28 @@ aws cloudformation deploy --stack-name ${STACK_NAME} --parameter-overrides \
 
 11. Check the status of the cloudformation template for progress in a different CLI window
 ```bash
-aws cloudformation describe-stack-events --stack-name <Your Stack Name>
+aws cloudformation describe-stack-events --stack-name $STACK_NAME
 ```
 
+### Add a new bucket
+
+To add a new bucket to the existing stack for Dynatrace to pick logs, Run the below command.
+
+```bash
+export BUCKET_STACK_NAME=<Your new stack name>
+```
+
+```bash
+aws cloudformation deploy --stack-name ${BUCKET_STACK_NAME} --parameter-overrides \
+            SourceBucketName=<Your Bucket Name> \
+            KmsKey=<KMS Key ARN> \
+            SQSQueue=<SQS Queue ARN> \
+            --template-file template_bucket.yaml --capabilities CAPABILITY_IAM
+```
+
+```bash
+aws cloudformation describe-stack-events --stack-name $BUCKET_STACK_NAME
+```
 
 ### Next steps
 
