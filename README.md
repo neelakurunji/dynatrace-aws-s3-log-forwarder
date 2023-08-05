@@ -102,6 +102,7 @@ aws cloudformation deploy --stack-name ${STACK_NAME} --parameter-overrides \
             DynatraceEnvironment1ApiKeyParameter=$PARAMETER_NAME \
             ContainerImageUri=${REPOSITORY_URI}:latest \
             SourceBucketName=<Your Bucket Name> \
+            LogExpirationDays=<Number of days to delete logs> \
             KmsKey=<KMS Key ARN> \
             --template-file template.yaml --capabilities CAPABILITY_IAM
 ```
@@ -109,26 +110,6 @@ aws cloudformation deploy --stack-name ${STACK_NAME} --parameter-overrides \
 11. Check the status of the cloudformation template for progress in a different CLI window
 ```bash
 aws cloudformation describe-stack-events --stack-name $STACK_NAME
-```
-
-### Add a new bucket
-
-To add a new bucket to the existing stack for Dynatrace to pick logs, Run the below command.
-
-```bash
-export BUCKET_STACK_NAME=<Your new stack name>
-```
-
-```bash
-aws cloudformation deploy --stack-name ${BUCKET_STACK_NAME} --parameter-overrides \
-            SourceBucketName=<Your Bucket Name> \
-            KmsKey=<KMS Key ARN> \
-            SQSQueue=<SQS Queue ARN> \
-            --template-file template_bucket.yaml --capabilities CAPABILITY_IAM
-```
-
-```bash
-aws cloudformation describe-stack-events --stack-name $BUCKET_STACK_NAME
 ```
 
 ### Next steps

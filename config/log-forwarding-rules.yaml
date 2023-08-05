@@ -20,7 +20,7 @@
 # to apply without having to explicitly create rules for each and every S3 bucket you want to send
 # logs from. You may delete it if you want to forward logs only for those buckets explicitly configured
 # in this file.w1 .
-bucket_name: pega-cloud-logs-poc
+bucket_name: pega-cloud-logs-prod
 log_forwarding_rules:
   - name: forward_all
     # Match any file in your bucket

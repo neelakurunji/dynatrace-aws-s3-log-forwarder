@@ -33,6 +33,9 @@ Parameters:
   KmsKey:
     Description: The ARN of the KMS key created for the bucket
     Type: String
+  LogExpirationDays:
+    Description: The number of days to retain logs
+    Type: Number
   DynatraceEnvironment1URL:
     Description: URL of your Dynatrace environment.
     Type: String
@@ -185,6 +188,13 @@ Resources:
         QueueConfigurations:
           - Event: 's3:ObjectCreated:*'
             Queue: !GetAtt S3NotificationsQueue.Arn
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteEverythingin30days
+            Prefix:
+            status: Enabled
+            ExpirationInDays: !Ref LogExpirationDays
+            
   QueueProcessingFunction:
     Type: AWS::Serverless::Function
     Metadata:
