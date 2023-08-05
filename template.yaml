@@ -190,9 +190,8 @@ Resources:
             Queue: !GetAtt S3NotificationsQueue.Arn
       LifecycleConfiguration:
         Rules:
-          - Id: DeleteEverythingin30days
-            Prefix:
-            status: Enabled
+          - Id: DeleteEverything
+            Status: Enabled
             ExpirationInDays: !Ref LogExpirationDays
             
   QueueProcessingFunction:
