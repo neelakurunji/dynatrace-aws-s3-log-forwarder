@@ -43,14 +43,8 @@ git clone https://github.com/neelakurunji/dynatrace-aws-s3-log-forwarder.git
 
 2. Change the bucket name to your desired value in the below two files - 
 - config/log-forwarding-rules.yaml
-- config/log-processing-rules.yaml
 
-3. Build the docker image
-```bash
-docker build . --build-arg="ARCH=X86_64" --build-arg="ENABLE_LAMBDA_INSIGHTS=false" --build-arg="LAMBDA_BASE_IMAGE_TAG=3.9.2023.06.28.13" --tag=dynatrace-aws-s3-log-forwarder:latest
-```
-
-4. Export the following variables
+3. Export the following variables
 ```bash
 export STACK_NAME=<Your Stack Name>
 ```
@@ -70,19 +64,24 @@ export PARAMETER_VALUE=<Your Dynatrace Token>
 aws ssm put-parameter --name $PARAMETER_NAME --type SecureString --value $PARAMETER_VALUE -—overwrite
 ```
 
+4. Build the docker image
+```bash
+docker build . --build-arg="ARCH=X86_64" --build-arg="ENABLE_LAMBDA_INSIGHTS=false" --build-arg="LAMBDA_BASE_IMAGE_TAG=3.9.2023.06.28.13" --tag=$STACK_NAME:latest
+```
+
 5. Create an AWS ECR repository
 ```bash
-aws ecr create-repository --repository-name dynatrace-aws-s3-log-forwarder
+aws ecr create-repository --repository-name $STACK_NAME
 ```
 
 6. Fetch the repository URI
 ```bash
-export REPOSITORY_URI=$(aws ecr describe-repositories --repository-names dynatrace-aws-s3-log-forwarder --query 'repositories[0].repositoryUri' --output text)
+export REPOSITORY_URI=$(aws ecr describe-repositories --repository-names $STACK_NAME --query 'repositories[0].repositoryUri' --output text)
 ```
 
 7. Tag the Docker image
 ```bash
-docker tag dynatrace-aws-s3-log-forwarder:latest ${REPOSITORY_URI}:latest
+docker tag $STACK_NAME:latest ${REPOSITORY_URI}:latest
 ```
 
 8. Login to AWS ECR registry
